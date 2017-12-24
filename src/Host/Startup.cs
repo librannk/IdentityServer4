@@ -1,4 +1,4 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -38,17 +38,19 @@ namespace Host
                     options.Events.RaiseSuccessEvents = true;
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseErrorEvents = true;
+                    options.IssuerUri = _config["IdentityServer:IssuerUri"];
                 })
-                .AddInMemoryClients(Clients.Get())
-                //.AddInMemoryClients(_config.GetSection("Clients"))
+                //.AddInMemoryClients(Clients.Get())
+                .AddInMemoryClients(_config.GetSection("Clients"))
                 .AddInMemoryIdentityResources(Resources.GetIdentityResources())
-                .AddInMemoryApiResources(Resources.GetApiResources())
+                .AddInMemoryApiResources(_config.GetSection("ApiResources"))
                 .AddDeveloperSigningCredential()
                 .AddExtensionGrantValidator<Extensions.ExtensionGrantValidator>()
                 .AddExtensionGrantValidator<Extensions.NoSubjectExtensionGrantValidator>()
                 .AddJwtBearerClientAuthentication()
                 .AddAppAuthRedirectUriValidator()
-                .AddTestUsers(TestUsers.Users);
+                .AddTestUsers(TestUsers.GetTestUsers(_config));
+                //.AddTestUsers(TestUsers.Users);
 
             services.AddExternalIdentityProviders();
 

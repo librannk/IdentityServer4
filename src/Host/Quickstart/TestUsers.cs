@@ -1,16 +1,38 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
 using IdentityModel;
 using IdentityServer4.Test;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Linq;
+using System;
 
 namespace IdentityServer4.Quickstart.UI
 {
     public class TestUsers
     {
+        IConfigurationSection _config;
+
+        public static List<TestUser> GetTestUsers(IConfiguration config)
+        {
+            var users = new List<TestUser>();
+            config.GetSection("Users").Bind(users);
+
+            for(int i=0; i<users.Count; i++){
+                var claims = config.GetSection($"Users:{i}:Claims").GetChildren();
+
+                foreach(var c in claims){
+                    var claim = new Claim(c.Key, c.Value);
+                    users[i].Claims.Add(claim);
+                }
+            }
+            
+            return users;
+        }
+
         public static List<TestUser> Users = new List<TestUser>
         {
             new TestUser{SubjectId = "818727", Username = "alice", Password = "alice", 
