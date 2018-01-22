@@ -11,6 +11,7 @@ using IdentityServer4;
 using Microsoft.AspNetCore.Http;
 using IdentityServer4.Quickstart.UI;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Host
 {
@@ -18,9 +19,15 @@ namespace Host
     {
         private readonly IConfiguration _config;
 
-        public Startup(IConfiguration config)
+        public Startup(IHostingEnvironment env)
         {
-            _config = config;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile("config/appsettings.config.json", optional: true)
+                .AddEnvironmentVariables();
+
+            _config = builder.Build();
         }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
